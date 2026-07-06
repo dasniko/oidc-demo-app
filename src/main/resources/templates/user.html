@@ -1,35 +1,30 @@
 {#include template.html}
 	{#body}
 		<h2>User Info {principal} - <a href="/logout" class="btn btn-warning btn-sm">Logout</a></h2>
-	<hr/>
-		<h3>Access Token</h3>
-		<pre><code>{accessToken}</code></pre>
-		<p><a href="https://jwt.io/#debugger-io?token={rawAccessToken}" target="_blank" rel="noopener noreferrer"
-					class="btn btn-info">Open in JWT.io</a></p>
-	<hr/>
-		<h3>ID Token</h3>
-		<pre><code>{idToken}</code></pre>
-		<p><a href="https://jwt.io/#debugger-io?token={rawIdToken}" target="_blank" rel="noopener noreferrer"
-					class="btn btn-info">Open in JWT.io</a></p>
-	<hr/>
-		<h3>User Info</h3>
-		<pre><code>{userInfo}</code></pre>
 		<hr/>
-		<h3>Upstream Identity Provider Tokens</h3>
-		<pre><code id="brokerresult"></code></pre>
+		<h3>Access Token</h3>
+		<pre>
+			<code>{accessToken}</code>
+		</pre>
 		<p>
-			<button class="btn btn-danger" onclick="getIdpTokens()">Get IdP Tokens</button>
+			<a href="https://jwt.io/#debugger-io?token={rawAccessToken}" target="_blank" rel="noopener noreferrer" class="btn btn-info">
+				Open in JWT.io
+			</a>
 		</p>
-		<script lang="javascript">
-			function getIdpTokens() {
-				const alias = prompt("IdP Alias", "oidc");
-				if (alias) {
-					fetch('/user/broker?alias=' + alias)
-						.then(response => response.json())
-						.then(data => document.getElementById("brokerresult").innerText = JSON.stringify(data, null, 2))
-						.catch(console.error);
-				}
-			}
-		</script>
+		<hr/>
+		<h3>ID Token</h3>
+		<pre>
+			<code>{idToken}</code>
+		</pre>
+		<p>
+			<a href="https://jwt.io/#debugger-io?token={rawIdToken}" target="_blank" rel="noopener noreferrer" class="btn btn-info">
+				Open in JWT.io
+			</a>
+		</p>
+		<hr/>
+		<h3>User Info</h3>
+		<pre>
+			<code>{userInfo}</code>
+		</pre>
 	{/body}
 {/include}

@@ -7,16 +7,13 @@ import io.quarkus.oidc.IdToken;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.security.Authenticated;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
@@ -41,10 +38,6 @@ public class UserInfo {
 	@Inject
 	ObjectMapper objectMapper;
 
-	@Inject
-	@RestClient
-	KeycloakClient keycloakClient;
-
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public TemplateInstance userInfo() throws IOException {
@@ -58,17 +51,6 @@ public class UserInfo {
 			.data("idToken", objectMapper.writeValueAsString(idToken))
 			.data("rawIdToken", idToken.getRawToken())
 			.data("userInfo", objectMapper.writeValueAsString(objectMapper.readValue(userInfo.getUserInfoString(), typeRef)));
-	}
-
-	@GET
-	@Path("broker")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> getIdpTokens(@QueryParam("alias") String alias) {
-		try {
-			return keycloakClient.getIdpToken(alias);
-		} catch (WebApplicationException e) {
-			return Map.of("message", e.getMessage());
-		}
 	}
 
 }
