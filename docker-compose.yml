@@ -1,9 +1,0 @@
-services:
-  application:
-    image: ghcr.io/dasniko/oidc-demo-app:latest
-    environment:
-      QUARKUS_OIDC_AUTH_SERVER_URL: http://localhost:8080/realms/demo
-      QUARKUS_OIDC_CLIENT_ID: quarkus-app
-      QUARKUS_OIDC_CREDENTIALS_SECRET: changeme
-    ports:
-      - "8081:8080"

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.quarkus.oidc.IdToken;
+import io.quarkus.oidc.UserInfo;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.security.Authenticated;
@@ -16,41 +17,48 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Base64;
 import java.util.Map;
 
-@Path("/user")
+@Path("/oidc")
 @Authenticated
-public class UserInfo {
+public class OidcInfo {
 
 	@Inject
-	Template user;
+	Template oidc;
 
 	@Inject
 	Principal principal;
+
 	@Inject
 	JsonWebToken accessToken;
+
 	@Inject
 	@IdToken
 	JsonWebToken idToken;
+
 	@Inject
-	io.quarkus.oidc.UserInfo userInfo;
+	UserInfo userInfo;
 
 	@Inject
 	ObjectMapper objectMapper;
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public TemplateInstance userInfo() throws IOException {
+	public TemplateInstance oidcInfo() throws IOException {
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-		TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {
-		};
-		return user
+		return oidc
 			.data("principal", principal.getName())
-			.data("accessToken", objectMapper.writeValueAsString(accessToken))
-			.data("rawAccessToken", accessToken.getRawToken())
-			.data("idToken", objectMapper.writeValueAsString(idToken))
-			.data("rawIdToken", idToken.getRawToken())
-			.data("userInfo", objectMapper.writeValueAsString(objectMapper.readValue(userInfo.getUserInfoString(), typeRef)));
+			.data("accessToken", payload(accessToken.getRawToken()))
+			.data("idToken", payload(idToken.getRawToken()))
+			.data("userInfo", objectMapper.writeValueAsString(objectMapper.readValue(userInfo.getUserInfoString(), new TypeReference<>() {})));
+	}
+
+	private String payload(String rawToken) throws IOException {
+		String payloadSegment = rawToken.split("\\.")[1];
+		byte[] payloadBytes = Base64.getUrlDecoder().decode(payloadSegment);
+		Map<String, Object> payload = objectMapper.readValue(payloadBytes, new TypeReference<>() {});
+		return objectMapper.writeValueAsString(payload);
 	}
 
 }
