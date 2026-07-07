@@ -1,1 +1,1 @@
-# Keycloak Demo App
+# OIDC Demo App
